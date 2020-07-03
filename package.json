@@ -1,0 +1,39 @@
+{
+  "name": "@manladag/cli",
+  "version": "1.0.0",
+  "description": "manladag command line",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "./bin/reset.js",
+    "prepublishOnly": "./node_modules/typescript/bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zepoze/manladag-real-cli.git"
+  },
+  "bin": {
+    "manladag": "./bin/index.js"
+  },
+  "preferGlobal": true,
+  "author": "Zepoze",
+  "license": "SEE LICENSE IN ./LICENSE",
+  "bugs": {
+    "url": "https://github.com/Zepoze/manladag-real-cli/issues"
+  },
+  "homepage": "https://github.com/Zepoze/manladag-real-cli#readme",
+  "devDependencies": {
+    "@types/nconf": "^0.10.0",
+    "@types/node": "^14.0.14",
+    "@types/rimraf": "^3.0.0",
+    "@types/yargs": "^15.0.5",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "@manladag/lelscanv": "^1.0.0",
+    "@manladag/source": "^2.1.1",
+    "nconf": "^0.10.0",
+    "rimraf": "^3.0.2",
+    "yargs": "^15.3.1"
+  }
+}

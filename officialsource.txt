@@ -1,0 +1,2 @@
+\ Lelscanv : @manladag/lelscanv \
+\ ScanManga : @manladag/scanmanga \
