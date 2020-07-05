@@ -12,7 +12,7 @@ export default function(argv: {
     $0: string;
 }) {
     const tmpDir = Path.join(fs.mkdtempSync(Path.join(os.tmpdir(),"manladag-cli")))
-    const mlag = fs.existsSync(argv["path"] as string) ? Path.join(argv["path"] as string,`${argv["source"]}-${argv["manga"]}-${argv["chapter"]}.mlag`) : argv["path"] as string
+    const mlag = fs.existsSync(argv["path"] as string) ? Path.join(argv["path"] as string,`${argv["source"]}-${argv["manga"]}-${argv["chapter"]}`) : argv["path"] as string
 
     const mdg = new ManladagSource(require(nconf.get(`${argv['source']}:module`)).Source).setOnDownloadChapterStartedListener(()=> {
         console.log('chapter started')
