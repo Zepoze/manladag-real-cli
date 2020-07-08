@@ -21,9 +21,7 @@ export default function(argv: {
             })
 
             console.log(`file${files.length>1?'s': ''}:\n\t${alphabFiles.join(',\n\t')}\n\n${files.length>1?'are': 'is'} serving on http://127.0.0.1:${port}`)
-            open(`http://127.0.0.1:${port}`, {app:["chromium-browser", "--new-window"]}).catch(()=> {
-                open(`http://127.0.0.1:${port}`).catch()
-            })
+            open(`http://127.0.0.1:${port}`).catch(function(){})
         
         })
     })
