@@ -46,7 +46,7 @@ export default function(y:yargs.Argv<{}>): yargs.Argv<{}>{
         }
 
         if(!nconf.get(`${argv['source']}:mangas:${argv['manga']}`)) {
-            throw new Error(`the manga "${argv['manga']}" doensn't exist in ${argv['source']} choose one in : ${Object.keys(nconf.get(argv['source']+':mangas')).toString()}`)
+            throw new Error(`the manga "${argv['manga']}" doensn't exist in ${argv['source']} choose one in : ${Object.keys(nconf.get(argv['source']+':mangas')).toString().replace(/, ?/g, '\n')}`)
         }
         return true
     })
