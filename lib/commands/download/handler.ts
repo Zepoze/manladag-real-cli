@@ -16,6 +16,8 @@ export default function(argv: {
     const mlag = fs.existsSync(argv["path"] as string) ? Path.join(argv["path"] as string,`${argv["source"]}-${argv["manga"]}-${argv["chapter"]}`) : argv["path"] as string
     
     let pb:ProgressBar
+    const StorageName = `${argv['source']}:mangas:${argv["manga"]}`
+
     const mdg = new ManladagSource(require(nconf.get(`${argv['source']}:module`)).Source)
     .setOnDownloadChapterStartedListener(({source, manga, chapter, numberPage})=> {
         //const t = new ConsoleDate(Date.now())
@@ -33,8 +35,32 @@ export default function(argv: {
     .setOnDownloadChapterFinishedListener(({path})=> {
         console.log(`download in -> ${path}`)
         console.log(`================ DOWNLOAD FINISHED`)
-        rimraf.sync(tmpDir)
-        process.exit(0)
+        nconf.set(StorageName, { ...nconf.get(StorageName), 
+            ...{
+                "last-downloaded-chapter": argv["chapter"],
+                "last-download-date": ((date:number) => {
+                    let d = new Date(date),
+                        month = '' + (d.getMonth() + 1),
+                        day = '' + d.getDate(),
+                        year = d.getFullYear();
+                
+                    if(month.length < 2) 
+                        month = '0' + month;
+                    if(day.length < 2) 
+                        day = '0' + day;
+                
+                    return [year, month, day].join('-');
+                })(Date.now())
+            }
+        })
+        let ttmp
+        let tmp = (ttmp =nconf.get(StorageName+':last-know-chapter')) ? ttmp  : -5
+        if((tmp)<(argv["chapter"] as number)) nconf.set(StorageName+':last-know-chapter',argv['chapter'])
+
+        nconf.save(() => {
+            rimraf.sync(tmpDir)
+            process.exit(0)
+        })
     })
     .setOnDownloadChapterErrorListener(({error}) => {
         console.log('\ndownload error '+error.message)

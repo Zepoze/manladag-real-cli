@@ -5,6 +5,8 @@ import express from 'express'
 import FileType from 'file-type' 
 import ejs from 'ejs'
 
+import MlagZip from '@manladag/source/dist/ClassMlagZip'
+
 async function go(files:string[], routeParam:string = '/') {
     const route = express.Router()
     let data: {[key:string]:{zip:AdmZip, html:string}} = {}
@@ -13,7 +15,7 @@ async function go(files:string[], routeParam:string = '/') {
     const template = fs.readFileSync(Path.join(__dirname,'../../../../../../assets/serve/chapter.ejs'),'utf-8')
 
     for(let i = 0;i<files.length;i++) {
-        const zip = new AdmZip(files[i])
+        const zip = new MlagZip(files[i])
         const infos = JSON.parse(zip.readAsText('manifest.json'))
 
         if(!(infos.site && infos.manga.name && infos.url && infos.chapter)) throw new Error(`${files[i]} is corrupted or not a mlag file`)
