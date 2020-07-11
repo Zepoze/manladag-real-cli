@@ -38,6 +38,7 @@ export default function(argv: {
         nconf.set(StorageName, { ...nconf.get(StorageName), 
             ...{
                 "last-downloaded-chapter": argv["chapter"],
+                "last-download-file": mlag,
                 "last-download-date": ((date:number) => {
                     let d = new Date(date),
                         month = '' + (d.getMonth() + 1),
