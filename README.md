@@ -7,11 +7,20 @@
 
 
 ## Installation
+### From npm registry
 
 Use the package manager [npm](https://www.npmjs.com/) to install Manladag.
 
 ```bash
 sudo npm install --global @manladag/cli
+```
+### From git
+```bash
+git clone https://github.com/zepoze/manladag-real-cli
+cd manladag-real-cli
+# position git on the branch you want to install
+git checkout <branch>
+sudo npm install --global .
 ```
 
 ## Usage
