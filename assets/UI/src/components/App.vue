@@ -25,7 +25,7 @@
       dark
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Toolbar</v-toolbar-title>
+      <v-toolbar-title>Toolbar - {{ text }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-app-bar-nav-icon @click.stop="drawerRight = !drawerRight"></v-app-bar-nav-icon>
     </v-app-bar>
@@ -77,6 +77,9 @@
               <span>Source</span>
             </v-tooltip>
           </v-col>
+          <v-col>
+            <test data="wowoo" @dis="show = !show" v-if="show"/>
+          </v-col>
         </v-row>
       </v-container>
     </v-main>
@@ -101,7 +104,13 @@
 </template>
 
 <script>
+  import options from 'options'
+  import Test from '@/components/test.vue'
+
   export default {
+    components: {
+      Test
+    },
     props: {
       source: String,
     },
@@ -110,6 +119,19 @@
       drawerRight: null,
       right: false,
       left: false,
+      text: 'wow',
+      show: true
     }),
+    sockets: {
+        connect(data) {
+            console.log('socket connected')
+            console.log(data)
+        },
+        init(data) {
+          console.log(data)
+        }
+    },
+    mounted() {
+    }
   }
 </script>

@@ -10,14 +10,16 @@ const root = Path.join(__dirname,'..','assets','UI')
 
 const webpackConfig = {
     entry: {
-        polyfill: '@babel/polyfill/noConflict',
+        polyfill: '@babel/polyfill',
         main: Path.join(root,'src','index'),
     },
     resolve: {
         extensions: [ '.js', '.vue' ],
         alias: {
             'vue$': isDev ? 'vue/dist/vue.runtime.js' : 'vue/dist/vue.runtime.min.js',
-            '@': Path.join(root,'src')
+            '@': Path.join(root,'src'),
+            'options':  Path.join(__dirname,'manladag.config.js'),
+            'socket.io-client': isDev ? 'socket.io-client/dist/socket.io.slim.dev.js': 'socket.io-client/dist/socket.io.slim.js'
         }
     },
     module: {
@@ -75,12 +77,11 @@ const webpackConfig = {
         new VueLoaderPlugin(),
         new VuetifyLoaderPlugin(),
         new HtmlPlugin({
-            title: 'dj',
             chunksSortMode: 'auto',
             filename: Path.join(root,'dist','index.html'),
-            template: Path.join(root,'src','index.html')
+            template: Path.join(root,'src','index.html'),
+            inject: false
         })
     ]
 }
-
 module.exports = webpackConfig
