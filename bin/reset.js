@@ -14,6 +14,12 @@ const official = data.split('\n').map((e) => {
     return e.replace(/\\ ?(.+) ?: ?(.+) ?\\/gi,"$2").trim()
 })
 
+let nbSource = 0
 official.forEach((e) => {
-    update(e)
+    nbSource += update(e)
 })
+
+if(nbSource == 0) {
+    console.log(`there is no source for manladag !!?`)
+    process.exit(1)
+}
