@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import store from './store'
+import store from './store/index.js'
 import VueSocketIO from 'vue-socket.io'
 import options from 'options'
 

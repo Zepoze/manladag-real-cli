@@ -50,8 +50,9 @@ const webpackConfig = merge(commonConfig, {
 const nodemon = require('nodemon')
 console.log('nodemon')
 nodemon({
-    script: Path.join(__dirname,'..','dist','commands','ui','handler','lib','expressApp.js'),
-    watch: [Path.join(__dirname,'..','dist','commands','ui','handler','lib'), Path.join(__dirname,'..','config','manladag.config.js')]
+    ext: 'ts',
+    exec: "./node_modules/ts-node/dist/bin.js "+Path.join(__dirname,'..','lib','commands','ui','handler','lib','expressApp.ts'),
+    watch: [Path.join(__dirname,'..','lib','commands','ui','handler','lib'), Path.join(__dirname,'..','config','manladag.config.js')]
 })
 nodemon.on('start', function () {
     console.log('App has started');
