@@ -12,7 +12,7 @@ module.exports = function(url) {
         const Source = require(url).Source
         nconf.set(`${Source.site.toLowerCase()}:mangas`, {})
         Object.keys(Source.mangas).forEach((e)=> {
-            nconf.set(`${Source.site.toLowerCase()}:mangas:${e}`, {})
+            nconf.set(`${Source.site.toLowerCase()}:mangas:${e}`, { name: Source.mangas[e].name })
         })
         nconf.set(`${Source.site.toLowerCase()}:module`,url)
         nconf.save()

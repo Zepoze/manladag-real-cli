@@ -32,15 +32,28 @@
 
     <v-navigation-drawer
       v-model="drawer"
+      color="secondary"
       app
     >
-      <v-list dense>
+      <v-list dense color="white">
         <v-list-item @click.stop="left = !left">
           <v-list-item-action>
             <v-icon>mdi-exit-to-app</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Open Temporary Drawer</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider/>
+        <v-list-item color="secondary" class="white" v-for="(s,i) in source" :key="i" :to="`/Source/${s}`">
+          <v-list-item-content>
+            <v-list-item-title class="text-center text-uppercase" v-text="s"/>
+          </v-list-item-content>
+        </v-list-item>
+        <v-spacer />
+        <v-list-item to="/">
+          <v-list-item-content>
+            <v-list-item-title> HOME </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -53,35 +66,7 @@
     ></v-navigation-drawer>
 
     <v-main>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          justify="center"
-          align="center"
-        >
-          <v-col class="shrink">
-            <v-tooltip right>
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  :href="source"
-                  icon
-                  large
-                  target="_blank"
-                  v-on="on"
-                >
-                  <v-icon large>mdi-code-tags</v-icon>
-                </v-btn>
-              </template>
-              <span>Source</span>
-            </v-tooltip>
-          </v-col>
-          <v-col>
-            <test data="wowoo" @dis="show = !show" v-if="show"/>
-          </v-col>
-        </v-row>
-      </v-container>
+      <router-view></router-view>
     </v-main>
 
     <v-navigation-drawer
@@ -104,15 +89,13 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import options from 'options'
   import Test from '@/components/test.vue'
 
   export default {
     components: {
       Test
-    },
-    props: {
-      source: String,
     },
     data: () => ({
       drawer: null,
@@ -122,16 +105,15 @@
       text: 'wow',
       show: true
     }),
+    computed: {
+      ...mapGetters([
+        'source'
+      ])
+    },
     sockets: {
-        connect(data) {
-            console.log('socket connected')
-            console.log(data)
-        },
-        init(data) {
-          console.log(data)
-        }
     },
     mounted() {
+      console.log('app mounted')
     }
   }
 </script>
