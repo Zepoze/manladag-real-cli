@@ -4,7 +4,7 @@ import VueSocketIO from 'vue-socket.io'
 import options from 'options'
 
 Vue.use(new VueSocketIO({
-    debug: options.isDev,
+    debug: true,
     connection: options.ui.hostBase,
     vuex: {
         store,

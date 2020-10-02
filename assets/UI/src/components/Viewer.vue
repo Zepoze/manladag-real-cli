@@ -66,7 +66,7 @@
             </v-card>
           </v-menu>
         </v-toolbar>
-      <v-window v-scroll="onScroll" v-model="onboarding" vertical :class="[toolbar ? 'with_toolbar' : 'with_no_toolbar']" id="wfix" v-on:keyup.enter="showSearchDialog">
+      <v-window v-scroll="onScroll" v-model="onboarding" vertical :class="[toolbar ? 'with_toolbar' : 'with_no_toolbar']" id="wfix">
       <v-window-item
         v-for="(n,i) in images"
         :key="`card-${i}-${render}`"
