@@ -8,12 +8,19 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: LocalViewer        
+        component: LocalViewer,
+        props: { allowLocalViewer:true }
+
     },
     {
         path: '/source/:source',
         name: 'Source',
         component: Source
+    },
+    {
+        path: '/reader/:source/:mangaKey/:chapter(\\d+,\?\\d+)',
+        name: 'Reader',
+        component: LocalViewer
     }
 ]
 

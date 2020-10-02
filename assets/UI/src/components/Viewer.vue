@@ -1,5 +1,8 @@
 <template>
     <v-container fluid class="black">
+      <v-dialog  v-model="searchDialog" scrollable>
+        <search-card  @read="read"/>
+      </v-dialog>
       <v-card color="grey darken-4" style="position: absolute;bottom: 0;top: 0;right:0;left:0;" :loading="loadingMlag">
         <v-toolbar dense transition="slide-x-transition" v-if="toolbar">
           <v-toolbar-title>Viewer - {{ toolbarInfo }}</v-toolbar-title>
@@ -48,10 +51,13 @@
                             </v-btn>
                           </v-col>
                         </v-row>
-                        <v-row>
+                        <v-row v-if="allowLocalViewer">
                           <v-col cols="12">
                             <v-file-input show-size label="File input" accept=".mlag" @change="mlagFile"></v-file-input>
                           </v-col>
+                        </v-row>
+                        <v-row>
+                          <v-btn @click="showSearchDialog"> Reader</v-btn>
                         </v-row>
                       </v-container>
                     </v-list-item-action>
@@ -60,7 +66,7 @@
             </v-card>
           </v-menu>
         </v-toolbar>
-      <v-window v-scroll="onScroll" v-model="onboarding" vertical :class="[toolbar ? 'with_toolbar' : 'with_no_toolbar']" id="wfix">
+      <v-window v-scroll="onScroll" v-model="onboarding" vertical :class="[toolbar ? 'with_toolbar' : 'with_no_toolbar']" id="wfix" v-on:keyup.enter="showSearchDialog">
       <v-window-item
         v-for="(n,i) in images"
         :key="`card-${i}-${render}`"
@@ -79,9 +85,20 @@
     </v-container>
 </template>
 <script>
-import jsZip from 'jszip'
+//import jsZip from 'jszip'
+import SearchCard from '@/components/SearchCard.vue'
+let jsZip
 import _ from 'lodash'
 export default {
+    components: {
+      SearchCard
+    },
+    props: {
+      allowLocalViewer: {
+        type: Boolean,
+        default: false
+      }
+    },
     data: () => ({
       render:0,
       infos: undefined,
@@ -92,8 +109,19 @@ export default {
       zoom:0,
       fullScreen: false,
       loadingMlag: false,
-      invoked:0
+      loadingError: false,
+      invoked:0,
+      searchDialog: false
     }),
+    watch: {
+      infos(val) {
+        try {
+          Object.keys(val)
+          this.onboarding = 0
+        } finally {}
+      },
+      '$route': 'fetchChapterPages'
+    },
     computed: {
       heightFromZoomFactor() {
         if(this.fullScreen)
@@ -103,9 +131,13 @@ export default {
 
       toolbarInfo() {
         const infos = this.infos
-        if(!infos)
-          return 'No file Loaded'
-        else return infos.manga.name+'  -  '+infos.chapter
+        if(!!infos)
+          return infos.manga.name+'  -  '+infos.chapter
+        else if(this.loadingMlag) return 'Loading' 
+        else
+        if(this.loadingError)
+          return this.getErrorMessage(this.loadingError)
+        else return 'No file Loaded'
       }
     },
     methods: {
@@ -148,14 +180,57 @@ export default {
                 if(i==0) this.loadingMlag = false
               })
             })
-            
-             
-
-
           })
         })
+      },
+      fetchChapterPages() {
+        this.loadingMlag = true
+
+        this.sockets.subscribe('get-chapter-pages-response',({ manga, pages, error }) => {
+          this.sockets.unsubscribe('get-chapter-pages-response')
+          if(error){
+            this.loadingError = error
+            //this.loadingMlag = false
+          }
+          else {
+            this.infos = { manga, chapter: parseFloat(this.$route.params.chapter)}
+            this.images = pages
+          }
+          this.loadingMlag = false
+        })
+
+        this.$socket.emit('get-chapter-pages', this.$route.params)
+      },
+      getErrorMessage(num) {
+        switch(num) {
+          case 2:
+            return 'Chapter unavailable'
+          case 1:
+            return 'Library unavailable'
+        }
+      },
+      showSearchDialog() {
+        console.log(this.searchDialog)
+        this.searchDialog = true
+      },
+      go() {
+        console.log('go')
+      },
+      read({ source, chapter, mangaKey}) {
+        this.searchDialog = false
+        this.$router.push({ path: `/reader/${source}/${mangaKey}/${chapter}`})
       }
     },
+    created() {
+      if(this.allowLocalViewer) {
+        const jszip = require('jszip')
+        jsZip = jszip
+      } 
+      else {
+        jsZip = undefined
+        this.fetchChapterPages()
+      }
+    }
   }
 </script>
 <style>

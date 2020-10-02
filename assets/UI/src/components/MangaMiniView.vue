@@ -1,5 +1,5 @@
 <template>
-    <v-card :width="width" :height="height">
+    <v-card :width="width" :height="height" to="/reader/lelscanv/one-piece/990">
         <v-img max-width="auto" max-height="70%" :src="src ? src : 'https://lelscan.net/mangas/one-piece/990/00.jpg?v=fr1599814660'" contain>
         </v-img>
         <v-card-text>{{ mangaName}} </v-card-text>
@@ -10,11 +10,11 @@ import axios from 'axios'
 export default {
     props: {
         height: {
-            type: String,
+            type: String | Number,
             default: 'auto'
         },
         width: {
-            type: String,
+            type: String | Number,
             default: 'auto'
         },
         mangaName: {
