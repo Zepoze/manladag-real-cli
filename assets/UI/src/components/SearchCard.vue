@@ -1,5 +1,5 @@
 <template>
-  <v-card max-width="500px" class="mx-auto">
+  <v-card max-width="500px" class="mx-auto" dark>
     <v-card-title>
       <v-spacer>
         <v-text-field
@@ -19,7 +19,7 @@
           label="Chapter"
           single-line
           hide-details
-          @keyup.enter="gop"
+          @keyup.enter="readTry"
           @blur="itemSelected = {}"
         ></v-text-field>
       </v-spacer>
@@ -41,24 +41,48 @@
             </v-icon>
             <v-icon
               small
-              @click="go(item)"
             >
               mdi-download
             </v-icon>
           </template>
+          <template v-slot:item.last="{ item }">
+            <v-tooltip v-if="item['last-know-chapter']" left>
+              <template v-slot:activator="{on, attrs}">
+                <span>
+                  <v-icon v-if="nowForLast - item['last-chapter-check'] >= intervalLastChapter" @click="getLastChapter(item)" x-small>
+                    mdi-autorenew
+                  </v-icon>
+                  <v-chip v-bind="attrs" v-on="on" @click="read(item, true)" x-small>{{ item["last-know-chapter"] }}</v-chip>
+                </span>
+              </template>
+              <div>
+                <span>Check at : {{ item["last-chapter-check"] ? literalDate(item) : 'unknow' }}</span>
+              </div>
+            </v-tooltip>
+            <v-icon v-else @click="getLastChapter(item)" small>
+              mdi-autorenew
+            </v-icon>
+          </template>
+
         </v-data-table>
     </v-card-text>
     <v-divider></v-divider>
     <v-card-actions>
-      <v-btn @click="go">hola</v-btn>
+      <v-btn>hola</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 <script>
 import _ from 'lodash'
+import { isDev } from 'options'
+import { logDev } from 'utils'
+import { setInterval, clearInterval } from 'timers'
+let interval
 export default {
     data() {
       return {
+        intervalLastChapter: 1000*60*10,
+        nowForLast: Date.now(),
         itemSelected: {},
         modeSearch: true,
         search: undefined,
@@ -72,6 +96,11 @@ export default {
             text: 'Manga',
             value: 'name'
           },
+          {
+            text: 'Last',
+            value: 'last',
+            sortable: false
+          },
           { text: 'Actions',
             value: 'actions',
             sortable: false
@@ -80,10 +109,18 @@ export default {
 
       }
     },
+    beforeMount() {
+      this.nowForLast = Date.now()
+      interval = setInterval(() => {
+        this.nowForLast = Date.now()
+      },1000*60*30)
+    },
+    beforeDestroy() {
+      clearInterval(interval)
+    },
     computed: {
       datax() {
         const d = this.$store.state.data
-        console.log(d)
         return _.flatten(
           _.concat(Object.values(d).map(
             (e,i)=> Object.values(e.mangas).map( 
@@ -94,18 +131,16 @@ export default {
       }
     },
     methods: {
-      go(data) {
-        console.log(data ? data : this.datax)
-      },
-      read(item) {
-        this.itemSelected = { mangaKey: item.mangaKey, source: item.source, mode: 'read' }
+      read(item, last) {
+        let c =''
+        if((c = item["last-know-chapter"]) && last) this.chapter = ''+c
+        this.itemSelected = { mangaKey: item.mangaKey, source: item.source, mode: 'read' }        
         this.$refs.chapter.$el.focus()
-        console.log(this.$refs.chapter)
 
       },
-      gop(data) {
+      readTry(data) {
         if(this.ruleChapter(this.chapter)) {
-          console.log('ready')
+          logDev('ready')
           this.$emit('read', { ...this.itemSelected, chapter: parseFloat(this.chapter) })
         }
       },
@@ -113,6 +148,22 @@ export default {
         const c = parseFloat(v)
         return v!='' && typeof(c) == 'number' && c >=0 && c!= 0 ? Math.floor(Math.log10(c)) + (c%1 ===0 ? 1 : 2 + (''+c).replace(/\d+\.()/i, '$1').length) == v.length : v.length == 1
       },
+      getLastChapter({ source, mangaKey }) {
+        this.$socket.emit('get-last-chapter', { source, mangaKey })
+      },
+      literalDate(i) {
+        try {
+          const n = i["last-chapter-check"]
+          const date = new Date(n)
+          const now = new Date(Date.now())
+          const dateStr= `${date.getMonth()+1}/${date.getDate()}${now.getFullYear() != date.getFullYear() ? date.getUTCFullYear() : ''}`
+          if(date.getMonth() == now.getMonth() && date.getDate() == now.getDate() && date.getFullYear() == now.getFullYear()) {
+            return dateStr+' '+ `${date.getHours()}:${date.getMinutes() < 10 ? '0'+date.getMinutes() : date.getMinutes() }`
+          } else return dateStr
+        } catch(e) {
+          return 'unknow'
+        }
+      }
     }
 }
 </script>

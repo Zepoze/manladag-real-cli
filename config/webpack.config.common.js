@@ -19,6 +19,7 @@ const webpackConfig = {
             'vue$': isDev ? 'vue/dist/vue.runtime.js' : 'vue/dist/vue.runtime.min.js',
             '@': Path.join(root,'src'),
             'options':  Path.join(__dirname,'manladag.config.js'),
+            'utils': Path.join(__dirname,'..','assets','UI','utils','index.js'),
             'socket.io-client': isDev ? 'socket.io-client/dist/socket.io.slim.dev.js': 'socket.io-client/dist/socket.io.slim.js'
         }
     },

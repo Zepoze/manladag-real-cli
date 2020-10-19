@@ -26,6 +26,11 @@ if(process.env.NODE_ENV ==='development') {
         console.log('dev server for ui is listening on ', options.ui.devPort)
     })
 
-} else App.use(express.static(c))
+} else {
+    App.use(express.static(c))
+    App.use(function(req,res) {
+        res.send('ui : bad request ')
+    })
+}
 
 export default server

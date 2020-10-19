@@ -10,6 +10,13 @@ export default new Vuex.Store({
     mutations: {
         "SOCKET_init"(state,p) {
             state.data = {...p}
+        },
+        "SOCKET_get-last-chapter"(state, { source, mangaKey, chapter, check }) {
+            if(chapter)
+                state.data[source].mangas[mangaKey] = {...state.data[source].mangas[mangaKey], "last-know-chapter":chapter}
+            if(check)
+            state.data[source].mangas[mangaKey] = {...state.data[source].mangas[mangaKey], "last-chapter-check": check }
+
         }
     },
     actions: {},

@@ -1,4 +1,4 @@
-export function getSource(id:string) : any {
+export default function getSource(id:string) : any {
     console.log(id)
     try {
         const Source = require(id).Source
