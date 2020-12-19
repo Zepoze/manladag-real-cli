@@ -6,7 +6,8 @@ import { ManladagSource } from '@manladag/source'
 import getSource from '../../../../../utils/getSource'
 import getLastChapter from './getLastChapter'
 import {save,get} from './cache'
-import { type } from 'os';
+import { getCacheInfo, deleteCache } from './getCacheInfo'
+const LogPrefix = '===================== DEV LOG : '
 const file = nconf.file(Path.join(__dirname,'..','..','..','..','..','..','data.json'))
 
 const initSource = nconf.get()
@@ -27,11 +28,12 @@ export default function(server:Server, isDev:boolean) {
         console.log('go')
         socket.emit('init', initSource)
         socket.on('get-last-chapter', getLastChapter(socket,file))
-        
+        socket.on('get-cache-infos', getCacheInfo(socket))
+        socket.on('delete-cache', deleteCache(socket))
         socket.on('get-chapter-pages', ({ source, mangaKey, chapter }) => {
             console.log(chapter)
             const chap = parseFloat(chapter)
-            let ms: ManladagSource, fromLocal:string[]|null = null
+            let ms: ManladagSource, fromLocal:string[]|null = null, SecondalreadyCached = false
             try {
                 ms = new ManladagSource(getSource(initSource[source].module))
             } catch(e) {
@@ -62,19 +64,36 @@ export default function(server:Server, isDev:boolean) {
                 .then((pages) => {
                     if(!!!fromLocal) save(source,mangaKey,chap,pages)
                     socket.nsp.emit('get-chapter-pages-response',{ error: undefined , pages, manga: ms.mangas[mangaKey] })
-                    console.log(pages)
-                    
                 }).catch((error) => {
                     console.log('some error')
                     console.log(error)
                     socket.nsp.emit('get-chapter-pages-response',{ error: (error<999)? error:0 , pages: undefined })
                 })
-                if(!r) ms.getUrlPages(mangaKey,chap+1).then((pa) => {
+                /*if(!r) ms.getUrlPages(mangaKey,chap+1).then((pa) => {
                     save(source,mangaKey,chap+1,pa)
                     console.log('the second was cached')
-                }).catch((e)=>{console.log(e)})
-            }).catch((error) => {
-                console.log('some error')
+                    console.log(chap+1)
+                }).catch((e)=>{console.log(e)})*/
+                if(!r) return ms.chapterIsAvailable(mangaKey,chap+1)
+                else {
+                    SecondalreadyCached = true
+                    return false
+                }
+            })
+            .then((available1) => {
+                if(available1) return ms.getUrlPages(mangaKey,chap+1)
+                else {
+                    if(SecondalreadyCached) console.log(LogPrefix+"next chap already cached")
+                    else console.log(LogPrefix+"next chap not available")
+                    return []
+                }
+            })
+            .then((pa) => {
+                if(pa.length>0) save(source,mangaKey,chap+1,pa).then(() => console.log(LogPrefix+"second cached !")).catch((e) => { console.log(LogPrefix+'error from second cached'); console.log(e) })
+                else if(!SecondalreadyCached) console.log(LogPrefix+"Second not cached")
+            })
+            .catch((error) => {
+                console.log(LogPrefix+'some error')
                 console.log(error)
                 socket.nsp.emit('get-chapter-pages-response',{ error: (error<999)? error:0 , pages: undefined })
             })

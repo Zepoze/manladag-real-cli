@@ -17,6 +17,8 @@
           v-show="itemSelected.mode"
           append-icon="mdi-magnify"
           label="Chapter"
+          type="number"
+          :max="max"
           single-line
           hide-details
           @keyup.enter="readTry"
@@ -128,13 +130,18 @@ export default {
             )
           ))
         )
+      },
+      max() {
+        if(this.itemSelected) return this.itemSelected.last
+        return null
       }
     },
     methods: {
       read(item, last) {
         let c =''
         if((c = item["last-know-chapter"]) && last) this.chapter = ''+c
-        this.itemSelected = { mangaKey: item.mangaKey, source: item.source, mode: 'read' }        
+        else this.chapter = null
+        this.itemSelected = { mangaKey: item.mangaKey, source: item.source, mode: 'read', last: parseInt(c)}        
         this.$refs.chapter.$el.focus()
 
       },
@@ -146,6 +153,7 @@ export default {
       },
       ruleChapter(v) {
         const c = parseFloat(v)
+        if(v == null) return false
         return v!='' && typeof(c) == 'number' && c >=0 && c!= 0 ? Math.floor(Math.log10(c)) + (c%1 ===0 ? 1 : 2 + (''+c).replace(/\d+\.()/i, '$1').length) == v.length : v.length == 1
       },
       getLastChapter({ source, mangaKey }) {

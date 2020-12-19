@@ -16,7 +16,6 @@ App.use(isDev ? '/' : '/api', Router)
 
 
 if(process.env.NODE_ENV ==='development') {
-    console.log('in dev')
     const options = require('../../../.././../config/manladag.config')
     
     App.use(function(req,res) {
