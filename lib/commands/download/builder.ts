@@ -1,11 +1,17 @@
 import yargs = require("yargs");
 import Path from 'path'
-import nconf from 'nconf'
 import fs from 'fs'
 
-nconf.file(Path.join(__dirname,'..','..','..','data.json'))
+import { getNconfDataJSON } from '../../utils/getNconfData'
 
 export default function(y:yargs.Argv<{}>): yargs.Argv<{}>{
+    const nconf = getNconfDataJSON() 
+    const keys = Object.keys(nconf.get())
+    if(keys.length == 0 && !y.argv["help"]) {
+        console.log('No Manladag\'s library is installed ??')
+        console.log(`Try to run "${Path.basename(y.argv["$0"])} libs-settings"`)
+        process.exit(1)
+    }
     y.positional('path', {
         desc: 'filename or directorie the chapter will be downloaded',
         type: 'string',
@@ -19,7 +25,7 @@ export default function(y:yargs.Argv<{}>): yargs.Argv<{}>{
         'source': {
             alias: 's',
             describe: 'provide a source',
-            choices: Object.keys(nconf.get())
+            choices: keys
         },
         'manga': {
             alias: 'm',

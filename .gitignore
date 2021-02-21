@@ -106,3 +106,4 @@ dist
 #generate files
 
 data.json
+.libs/
