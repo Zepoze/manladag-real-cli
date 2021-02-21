@@ -1,4 +1,3 @@
-#!/bin/sh 
-":" //# comment; exec /usr/bin/env node --no-warnings "$0" "$@"
+#!/usr/bin/env node
 
 require('../dist/index.js')

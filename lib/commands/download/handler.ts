@@ -1,10 +1,11 @@
 import Path from 'path'
 import fs from 'fs'
-import nconf from 'nconf'
 import rimraf from 'rimraf'
 import os from 'os'
-import {ManladagSource, _DOWNLOAD} from '@manladag/source'
-nconf.file(Path.join(__dirname,'..','..','..','data.json'))
+import { ManladagSource, _DOWNLOAD} from '@manladag/source'
+import getManager from '../../utils/getManagerInstalledLib'
+import { getManladagLib } from '../../utils/getManladagLib'
+import { getNconfDataJSON } from '../../utils/getNconfData'
 
 import ProgressBar from '../../progressbar'
 
@@ -13,13 +14,16 @@ export const run =  async function(argv: {
     _: string[];
     $0: string;
 }) {
+    const manager = await getManager()
+    const nconf = getNconfDataJSON()
+
     const tmpDir = Path.join(fs.mkdtempSync(Path.join(os.tmpdir(),"manladag-cli")))
     const mlag = fs.existsSync(argv["path"] as string) ? Path.join(argv["path"] as string,`${argv["source"]}-${argv["manga"]}-${argv["chapter"]}`) : argv["path"] as string
     
     let pb:ProgressBar
     const StorageName = `${argv['source']}:mangas:${argv["manga"]}`
 
-    const mdg = new ManladagSource(require(nconf.get(`${argv['source']}:module`)).Source)
+    const mdg = new ManladagSource(getManladagLib(manager)(argv["source"] as string).Source)
     .setOnDownloadChapterStartedListener(({source, manga, chapter, numberPage})=> {
         //const t = new ConsoleDate(Date.now())
         console.log('================ DOWNLOAD START ')
