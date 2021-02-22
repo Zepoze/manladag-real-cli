@@ -7,7 +7,8 @@ import {ManladagSource, _DOWNLOAD} from '@manladag/source'
 nconf.file(Path.join(__dirname,'..','..','..','data.json'))
 
 import ProgressBar from '../../progressbar'
-export default function(argv: {
+
+export const run =  async function(argv: {
     [argName: string]: unknown;
     _: string[];
     $0: string;

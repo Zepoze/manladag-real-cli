@@ -1,8 +1,7 @@
 import serve from './lib'
 import open from 'open'
-import { key } from 'nconf';
 
-export default function(argv: {
+export const run =  function(argv: {
     [argName: string]: unknown;
     _: string[];
     $0: string;
